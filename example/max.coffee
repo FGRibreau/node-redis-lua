@@ -1,6 +1,6 @@
 #/usr/bin/env coffee
 redis = require 'redis'
-attachLua = require('redis-lua').attachLua
+attachLua = require('redis-lua2').attachLua
 
 r = attachLua(redis).createClient()
 

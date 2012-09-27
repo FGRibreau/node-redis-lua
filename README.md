@@ -11,7 +11,7 @@ Patch redis script commands into node-redis prototype.
 First attach `redis-lua` to `node_redis`:
 
     redis = require('redis');
-    require('redis-lua').attachLua(redis)
+    require('redis-lua2').attachLua(redis)
 
 Then define some scripts (scripts may take an _unlimited_ number of arguments):
 

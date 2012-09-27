@@ -1,6 +1,6 @@
 var redis = require('redis');
 
-require('redis-lua').attachLua(redis);
+require('redis-lua2').attachLua(redis);
 
 r = redis.createClient();
 

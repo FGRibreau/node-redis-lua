@@ -5,7 +5,7 @@ Patch redis script commands into node-redis prototype.
 
 ## Npm
 
-    npm install redis-lua
+    npm install redis-lua2
 
 ## Usage
 First attach `redis-lua` to `node_redis`:

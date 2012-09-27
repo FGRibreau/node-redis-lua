@@ -16,7 +16,7 @@ To use add lua support to redis module:
 
 Add some redis scripts:
 
-    redis.lua('myset', 2, 'return redis.call("set", KEYS[1], KEYS[2])');
+    redis.lua('myset', 'return redis.call("set", KEYS[1], KEYS[2])');
 
 If you want to return a javascript object add a 4th truthy parameter:
     redis.lua('hashtest, 0, 'return redis.call("hgetall", "something")', true);
@@ -24,7 +24,13 @@ If you want to return a javascript object add a 4th truthy parameter:
 And call like a regular redis command:
 
     r = redis.createClient();
-    r.myset('testing', 'surprise', redis.print);
+    r.myset(2, 'testing', 'surprise', redis.print);
+
+`2` is the number of keys that the script will receive. Array are also supported:
+
+    var args = ['testing', 'surprise']
+    ,   r = redis.createClient();
+    r.myset(args.length, args, function(err, res){console.log(arguments)});
 
 The lua script is passed by eval first time and evalsha subsequently
 with fallback to eval.

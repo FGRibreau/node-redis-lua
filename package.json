@@ -1,7 +1,7 @@
 {
   "name": "redis-lua",
   "description": "Adds lua scripting to node_redis",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "keywords": [
     "redis",
     "scripting",
@@ -19,15 +19,15 @@
     "url": "git://github.com/shirro/node_redis_lua.git"
   },
   "author": "Paul Shirren <shirro@shirro.com> (https://shirro.com/)",
+  "contributors":[
+        "Francois-Guillaume Ribreau <npm@fgribreau.com> (http://fgribreau.com)"
+  ],
   "main": "./redis-lua.js",
   "files": [
     "README",
     "redis-lua.js",
     "package.json"
   ],
-  "dependecies": {
-    "redis": ">=0.6.0"
-  },
   "engines": {
     "node": "*"
   },

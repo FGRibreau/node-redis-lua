@@ -35,11 +35,20 @@ function keyval(cb) {
 }
 
 exports.attachLua = function(redis) {
-  redis.lua = function(name, num_keys, script, keyed) {
+
+  /**
+   * redis.lua('myset', 2, 'return redis.call("set", KEYS[1], KEYS[2])');
+   * @param  {String} name     Script name
+   * @param  {String} script   Script string
+   * @param  {[type]} keyed    [description]
+   * @chainable
+   * @return {Redis}
+   */
+  redis.lua = function(name, script, keyed) {
     var script_sha;
 
     redis.RedisClient.prototype[name] = function() {
-      var cb, db, that = this, params;
+      var cb, db, self = this, params;
 
       params = [].slice.call(arguments, 0, arguments.length);
       if (params.length > 0 && typeof params[params.length - 1] == 'function') {
@@ -52,21 +61,23 @@ exports.attachLua = function(redis) {
         cb = keyval(cb);
       }
 
-      params.unshift(num_keys);
+      // params.unshift(num_keys);
 
       if (script_sha) {
-        evalsha_cmd(that, script_sha, params, function(err, res) {
+        evalsha_cmd(self, script_sha, params, function(err, res) {
           if (err && err.message.indexOf('NOSCRIPT') > 0) {
-            eval_cmd(that, script, params.slice(2, -1), cb);
+            eval_cmd(self, script, params.slice(2, -1), cb);
           } else {
             cb(err, res);
           }
         });
       } else {
         script_sha = script_sha || sha(script);
-        eval_cmd(that, script, params, cb);
+        eval_cmd(self, script, params, cb);
       }
     };
+
+    return this;
   };
   return redis;
 };

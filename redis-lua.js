@@ -1,7 +1,5 @@
-
-var 
-  createHash = require('crypto').createHash,
-  sha = function(str) {return createHash('sha1').update(str).digest('hex');};
+var createHash = require('crypto').createHash,
+    sha = function(str) {return createHash('sha1').update(str).digest('hex');};
 
 function eval_cmd(db, script, params, cb) {
   params.unshift(script);
@@ -19,44 +17,35 @@ function evalsha_cmd(db, script_sha, params, cb) {
 
 function keyval(cb) {
   return function(err, res) {
-    var
-      hash = {},
-      i,
-      key,
-      val;
+    var hash = {}, i, key, val;
 
     if (err) {
       cb(err);
-    } else if (res.length % 2 !== 0 ) {
+    } else if (res.length % 2 !== 0) {
       cb('result length not even');
     } else {
-      for(i=0; i<res.length; i +=2) {
+      for (i = 0; i < res.length; i += 2) {
         key = res[i].toString();
-        val = res[i+1];
-        hash[key] = val;   
+        val = res[i + 1];
+        hash[key] = val;
       }
-      cb(null, hash); 
+      cb(null, hash);
     }
   };
 }
 
 exports.attachLua = function(redis) {
   redis.lua = function(name, num_keys, script, keyed) {
-    var
-      script_sha;
-    
+    var script_sha;
+
     redis.RedisClient.prototype[name] = function() {
-      var
-        cb,
-        db,
-        that = this,
-        params;
+      var cb, db, that = this, params;
 
       params = [].slice.call(arguments, 0, arguments.length);
-      if (params.length > 0 && typeof params[params.length-1] == 'function') {
-          cb = params.pop();
+      if (params.length > 0 && typeof params[params.length - 1] == 'function') {
+        cb = params.pop();
       } else {
-        cb = function(){};
+        cb = function() {};
       }
 
       if (keyed) {
@@ -81,4 +70,3 @@ exports.attachLua = function(redis) {
   };
   return redis;
 };
-

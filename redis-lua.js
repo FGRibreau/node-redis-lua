@@ -1,18 +1,23 @@
 var createHash = require('crypto').createHash,
-    sha = function(str) {return createHash('sha1').update(str).digest('hex');};
+    _          = require('lodash'),
+    sha        = function(str) {return createHash('sha1').update(str).digest('hex');};
 
+/**
+ * [eval_cmd description]
+ * @param  {[type]}   db     [description]
+ * @param  {[type]}   script [description]
+ * @param  {[type]}   params [description]
+ * @param  {Function} cb     [description]
+ * @return {[type]}          [description]
+ */
 function eval_cmd(db, script, params, cb) {
   params.unshift(script);
-  params.unshift('eval');
-  params.push(cb);
-  db.send_command.apply(db, params);
+  db.send_command('eval', params, cb);
 }
 
 function evalsha_cmd(db, script_sha, params, cb) {
   params.unshift(script_sha);
-  params.unshift('evalsha');
-  params.push(cb);
-  db.send_command.apply(db, params);
+  db.send_command('evalsha', params, cb);
 }
 
 function keyval(cb) {
@@ -37,7 +42,7 @@ function keyval(cb) {
 exports.attachLua = function(redis) {
 
   /**
-   * redis.lua('myset', 2, 'return redis.call("set", KEYS[1], KEYS[2])');
+   * redis.lua( SCRIPTNAME , SCRIPT_PLAINTEXT, [keyed]);
    * @param  {String} name     Script name
    * @param  {String} script   Script string
    * @param  {[type]} keyed    [description]
@@ -45,39 +50,46 @@ exports.attachLua = function(redis) {
    * @return {Redis}
    */
   redis.lua = function(name, script, keyed) {
-    var script_sha;
+    var script_sha = null;
 
-    redis.RedisClient.prototype[name] = function() {
-      var cb, db, self = this, params;
+    redis.RedisClient.prototype[name] = function(){
+      var cb = function(){}, self = this, params;
 
-      params = [].slice.call(arguments, 0, arguments.length);
+      params = [].slice.call(arguments);
+
       if (params.length > 0 && typeof params[params.length - 1] == 'function') {
         cb = params.pop();
-      } else {
-        cb = function() {};
       }
+
+      if(!_.isArray(params)){
+        params = [params];
+      }
+
+      params = _.flatten(params);
 
       if (keyed) {
         cb = keyval(cb);
       }
 
-      // params.unshift(num_keys);
-
-      if (script_sha) {
-        evalsha_cmd(self, script_sha, params, function(err, res) {
-          if (err && err.message.indexOf('NOSCRIPT') > 0) {
-            eval_cmd(self, script, params.slice(2, -1), cb);
-          } else {
-            cb(err, res);
-          }
-        });
-      } else {
+      if (!script_sha) {
         script_sha = script_sha || sha(script);
         eval_cmd(self, script, params, cb);
+        return;
       }
+
+      evalsha_cmd(self, script_sha, params, function(err, res) {
+        if (err && err.message.indexOf('NOSCRIPT') > 0) {
+          // @todo test this part
+          eval_cmd(self, script, params.slice(2, -1), cb);
+        } else {
+          cb(err, res);
+        }
+      });
+
     };
 
     return this;
   };
+
   return redis;
 };

@@ -1,3 +1,6 @@
+Fork of **node_redis_lua** by shirro
+====================================
+
 Patch redis script commands into node-redis prototype. Does not assume node-redis
 has been patched with scripting support so can use the standard version.
 

@@ -4,7 +4,7 @@ attachLua = require('redis-lua').attachLua
 
 r = attachLua(redis).createClient()
 
-redis.lua 'hsetmax', 2, """
+redis.lua 'hsetmax', """
   local current = tonumber(redis.call('hget',KEYS[1], KEYS[2]))
   local max = tonumber(ARGV[1])
   if current == nil or current < max then
@@ -19,12 +19,12 @@ r.hset 'stat', 'thing', 5, (err, res) ->
     throw err
   else
     console.log "Setting stat->thing to 5"
-    r.hsetmax 'some_stat', 'some_thing', 6, (err, res) ->
+    r.hsetmax 2, 'some_stat', 'some_thing', 6, (err, res) ->
       if err
         throw err
       else
         console.log "Set to max of 6 or current, result: #{res}"
-        r.hsetmax 'some_stat', 'some_thing', 4, (err, res) ->
+        r.hsetmax 2, 'some_stat', 'some_thing', 4, (err, res) ->
           if err
             throw err
           else

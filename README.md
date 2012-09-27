@@ -1,17 +1,13 @@
 Fork of **node_redis_lua** by shirro
 ====================================
 
-Patch redis script commands into node-redis prototype. Does not assume node-redis
-has been patched with scripting support so can use the standard version.
+Patch redis script commands into node-redis prototype.
 
-Requires:
-	https://github.com/mranney/node_redis
-	Redis scripting branch, https://github.com/antirez/redis/tree/scripting
-
-Install from github or with:
+## Npm
 
     npm install redis-lua
 
+## Usage
 To use add lua support to redis module:
 
     redis = require('redis');
@@ -29,7 +25,7 @@ And call like a regular redis command:
     r = redis.createClient();
     r.myset(2, 'testing', 'surprise', redis.print);
 
-`2` is the number of keys that the script will receive. Array are also supported:
+`2` is the number of keys that the script will receive. Arrays are also supported:
 
     var args = ['testing', 'surprise']
     ,   r = redis.createClient();

@@ -48,15 +48,18 @@ exports.attachLua = function(redis) {
         params = [params];
       }
 
-      params = _.flatten(params);
+      params  = _.flatten(params);
+      params.unshift(script);
 
-      if (keyed) {
+      if(keyed){
         cb = keyval(cb);
       }
 
+      params.push(cb);
+
       // node_redis now support eval
       // https://github.com/mranney/node_redis/blob/master/index.js#L1067
-      this.eval(script, params, cb);
+      this.eval.apply(this, params);
     };
 
     return this;
